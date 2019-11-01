@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link
+        href="https://fonts.googleapis.com/css?family=Bangers|Faster+One|Fontdiner+Swanky|Luckiest+Guy|Mountains+of+Christmas|Permanent+Marker|Ranchers|Rock+Salt|Sarina&display=swap"
+        rel="stylesheet">
+
+    <style>
+        .Bangers {
+            font-family: 'Bangers',
+                cursive;
+        }
+
+        .Faster_One {
+            font-family: 'Faster One',
+                cursive;
+        }
+
+        .Fontdiner_Swanky {
+            font-family: 'Fontdiner Swanky',
+                cursive;
+        }
+
+        .Luckiest_Guy {
+            font-family: 'Luckiest Guy',
+                cursive;
+        }
+
+        .Mountains_of_Christmas {
+            font-family: 'Mountains of Christmas',
+                cursive;
+        }
+
+        .Permanent_Marker {
+            font-family: 'Permanent Marker',
+                cursive;
+        }
+
+        .Ranchers {
+            font-family: 'Ranchers',
+                cursive;
+        }
+
+        .Rock_Salt {
+            font-family: 'Rock Salt',
+                cursive;
+        }
+
+        .Sarina {
+            font-family: 'Sarina',
+                cursive;
+        }
+
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -moz-transform: translateX(-50%) translateY(-50%);
+            -webkit-transform: translateX(-50%) translateY(-50%);
+            transform: translateX(-50%) translateY(-50%);
+        }
+    </style>
+</head>
+
+<body id="body">
+
+    <script>
+
+        var fonts = ['Bangers', 'Faster_One', 'Fontdiner_Swanky', 'Luckiest_Guy',
+            'Mountains_of_Christmas', 'Permanent_Marker', 'Ranchers', 'Rock_Salt', 'Sarina'];
+        var rand = fonts[Math.floor(Math.random() * fonts.length)];
+        console.log(rand);
+
+        var bodyElement = document.getElementById("body");
+        bodyElement.className = rand;
+    </script>
+    <div class="container">
+        <h1 align="center">untz.net</h1>
+        <p align="center">contact: info@untz.net</p>
+    </div>
+
+</body>
+
+</html>
