@@ -1,88 +1,375 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title></title>
-    <link
-        href="https://fonts.googleapis.com/css?family=Bangers|Faster+One|Fontdiner+Swanky|Luckiest+Guy|Mountains+of+Christmas|Permanent+Marker|Ranchers|Rock+Salt|Sarina&display=swap"
-        rel="stylesheet">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>untz.net</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <style>
-        .Bangers {
-            font-family: 'Bangers',
-                cursive;
+        :root {
+            --bg: #F4F7FA;
+            --text: #1F2A33;
+            --ui-border: #C8D1DA;
+            --ui-fill-active: #E2E8EE;
+            --ui-icon: #3A4A57;
+            --ui-icon-active: #1F2A33;
+            --particle-color: 0, 100, 200; /* Darker blue for light mode */
         }
 
-        .Faster_One {
-            font-family: 'Faster One',
-                cursive;
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0B0D10;
+                --text: #E6E8EA;
+                --ui-border: #2A2F34;
+                --ui-fill-active: #1C2126;
+                --ui-icon: #C9CED3;
+                --ui-icon-active: #E6E8EA;
+                --particle-color: 0, 255, 255; /* Cyan for dark mode */
+            }
         }
 
-        .Fontdiner_Swanky {
-            font-family: 'Fontdiner Swanky',
-                cursive;
+        body.theme-light {
+            --bg: #F4F7FA;
+            --text: #1F2A33;
+            --ui-border: #C8D1DA;
+            --ui-fill-active: #E2E8EE;
+            --ui-icon: #3A4A57;
+            --ui-icon-active: #1F2A33;
+            --particle-color: 0, 100, 200;
         }
 
-        .Luckiest_Guy {
-            font-family: 'Luckiest Guy',
-                cursive;
+        body.theme-dark {
+            --bg: #0B0D10;
+            --text: #E6E8EA;
+            --ui-border: #2A2F34;
+            --ui-fill-active: #1C2126;
+            --ui-icon: #C9CED3;
+            --ui-icon-active: #E6E8EA;
+            --particle-color: 0, 255, 255;
         }
 
-        .Mountains_of_Christmas {
-            font-family: 'Mountains of Christmas',
-                cursive;
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            font-family: 'Work Sans', sans-serif;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
 
-        .Permanent_Marker {
-            font-family: 'Permanent Marker',
-                cursive;
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
         }
 
-        .Ranchers {
-            font-family: 'Ranchers',
-                cursive;
-        }
-
-        .Rock_Salt {
-            font-family: 'Rock Salt',
-                cursive;
-        }
-
-        .Sarina {
-            font-family: 'Sarina',
-                cursive;
-        }
-
-        .container {
-            font-size: 200%;
+        .content {
             position: absolute;
             top: 50%;
             left: 50%;
-            -moz-transform: translateX(-50%) translateY(-50%);
-            -webkit-transform: translateX(-50%) translateY(-50%);
-            transform: translateX(-50%) translateY(-50%);
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 60px;
+            width: 100%;
+            text-align: center;
+            z-index: 1;
+            color: var(--text);
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            font-weight: 400;
+            pointer-events: none;
+        }
+
+        h1 {
+            color: var(--text);
+            font-size: 5rem;
+            margin: 0;
+            letter-spacing: 5px;
+            animation: textPulse 3s infinite ease-in-out alternate;
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Theme Control */
+        .theme-control {
+            position: absolute;
+            top: 32px;
+            right: 32px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            background: transparent;
+            border: 1px solid var(--ui-border);
+            border-radius: 12px;
+            padding: 2px;
+            transition: border-color 0.3s ease;
+        }
+
+        .theme-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 10px;
+            margin: 0;
+            cursor: pointer;
+            color: var(--ui-icon);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .theme-btn.active {
+            background-color: var(--ui-fill-active);
+            color: var(--ui-icon-active);
+        }
+
+        .divider {
+            width: 1px;
+            height: 16px;
+            background-color: var(--ui-border);
+            margin: 0 2px;
+            opacity: 0.5;
+        }
+
+        @keyframes textPulse {
+            0% {
+                opacity: 0.9;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 3rem;
+            }
+            .theme-control {
+                top: 16px;
+                right: 16px;
+                border-radius: 10px;
+            }
         }
     </style>
 </head>
-
-<body id="body">
-
-    <script>
-
-        var fonts = ['Bangers', 'Faster_One', 'Fontdiner_Swanky', 'Luckiest_Guy',
-            'Mountains_of_Christmas', 'Permanent_Marker', 'Ranchers', 'Rock_Salt', 'Sarina'];
-        var rand = fonts[Math.floor(Math.random() * fonts.length)];
-        console.log(rand);
-
-        var bodyElement = document.getElementById("body");
-        bodyElement.className = rand;
-    </script>
-    <div class="container">
-        <h1 align="center">untz.net</h1>
-        <p align="center">contact: info@untz.net</p>
+<body>
+    <div class="theme-control" role="group" aria-label="Theme Switcher">
+        <button class="theme-btn active" id="btn-system" aria-label="System Theme" title="System">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        </button>
+        <div class="divider"></div>
+        <button class="theme-btn" id="btn-light" aria-label="Light Theme" title="Light">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <div class="divider"></div>
+        <button class="theme-btn" id="btn-dark" aria-label="Dark Theme" title="Dark">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+    </div>
+    <canvas id="canvas"></canvas>
+    <div class="content">
+        <h1>untz.net</h1>
     </div>
 
-</body>
+    <div class="footer">
+        contact: info@untz.net
+    </div>
 
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let particles = [];
+        const particleCount = 100;
+        const connectionDistance = 150;
+        const mouseDistance = 200;
+
+        let mouse = { x: null, y: null };
+
+        // Resize handling
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Mouse interaction
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2 + 1;
+                this.opacityBase = Math.random() * 0.5 + 0.1;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Bounce off edges
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+
+                // Mouse attraction (optional but nice for "dynamic")
+                if (mouse.x != null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouseDistance) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (mouseDistance - distance) / mouseDistance;
+                        const directionX = forceDirectionX * force * 0.05;
+                        const directionY = forceDirectionY * force * 0.05;
+                        this.vx += directionX;
+                        this.vy += directionY;
+                    }
+                }
+            }
+
+            draw(particleColor, fadeFactor) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${particleColor}, ${this.opacityBase * fadeFactor})`;
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Get current particle color from CSS variable
+            const particleColor = getComputedStyle(document.body).getPropertyValue('--particle-color').trim();
+            
+            // Global pulse for connections
+            const time = Date.now() * 0.001;
+            const pulse = (Math.sin(time) + 1) / 2; // 0 to 1
+            
+            const cx = width / 2;
+            const cy = height / 2;
+            const maskRadius = 300; // Radius where fading starts
+            const innerRadius = 100; // Radius where it's most faded
+
+            for (let i = 0; i < particles.length; i++) {
+                // Calculate distance from center for particle fade
+                let dx_p = particles[i].x - cx;
+                let dy_p = particles[i].y - cy;
+                let dist_p = Math.sqrt(dx_p * dx_p + dy_p * dy_p);
+                
+                // Calculate fade factor (0.1 to 1.0)
+                let fadeFactor = Math.max(0.1, Math.min(1, (dist_p - innerRadius) / (maskRadius - innerRadius)));
+
+                particles[i].update();
+                particles[i].draw(particleColor, fadeFactor);
+
+                // Draw connections
+                for (let j = i; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < connectionDistance) {
+                        // Calculate midpoint of the line for mask check
+                        let midX = (particles[i].x + particles[j].x) / 2;
+                        let midY = (particles[i].y + particles[j].y) / 2;
+                        let dx_m = midX - cx;
+                        let dy_m = midY - cy;
+                        let dist_m = Math.sqrt(dx_m * dx_m + dy_m * dy_m);
+                        
+                        // Line fade factor
+                        let lineFade = Math.max(0.1, Math.min(1, (dist_m - innerRadius) / (maskRadius - innerRadius)));
+
+                        ctx.beginPath();
+                        // Opacity based on distance and the global pulse
+                        let opacity = (1 - distance / connectionDistance) * 0.8;
+                        // Add pulsating effect to the lines
+                        opacity *= (0.5 + 0.5 * pulse); 
+                        // Apply radial mask fade
+                        opacity *= lineFade;
+                        
+                        ctx.strokeStyle = `rgba(${particleColor}, ${opacity})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        // Theme Control Logic
+        const btnSystem = document.getElementById('btn-system');
+        const btnLight = document.getElementById('btn-light');
+        const btnDark = document.getElementById('btn-dark');
+        const themeBtns = [btnSystem, btnLight, btnDark];
+
+        function setActiveButton(btn) {
+            themeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function applyTheme(theme) {
+            document.body.classList.remove('theme-light', 'theme-dark');
+            if (theme === 'light') {
+                document.body.classList.add('theme-light');
+            } else if (theme === 'dark') {
+                document.body.classList.add('theme-dark');
+            }
+        }
+
+        btnSystem.addEventListener('click', () => {
+            setActiveButton(btnSystem);
+            applyTheme('system');
+        });
+
+        btnLight.addEventListener('click', () => {
+            setActiveButton(btnLight);
+            applyTheme('light');
+        });
+
+        btnDark.addEventListener('click', () => {
+            setActiveButton(btnDark);
+            applyTheme('dark');
+        });
+    </script>
+</body>
 </html>

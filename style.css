@@ -1,0 +1,250 @@
+:root {
+    /* Font Families */
+    --font-primary: 'Orbitron', system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+    /* Light Mode Tokens (Default) */
+    --bg: #F4F7FA;
+    --text: #1F2A33;
+    --mesh-accent: #2FB8B2;
+    --ui-border: #C8D1DA;
+    --ui-fill-active: #E2E8EE;
+    --ui-icon: #3A4A57;
+    --ui-icon-active: #1F2A33;
+    --vignette-opacity: 0.3; /* Gentle edge falloff */
+    --glow-opacity: 0.3;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0B0D10;
+        --text: #E6E8EA;
+        --mesh-accent: #38D6D0;
+        --ui-border: #2A2F34;
+        --ui-fill-active: #1C2126;
+        --ui-icon: #C9CED3;
+        --ui-icon-active: #E6E8EA;
+        --vignette-opacity: 0.7; /* Stronger darkening */
+        --glow-opacity: 0.5;
+    }
+}
+
+/* Theme Overrides */
+body.theme-light {
+    --bg: #F4F7FA;
+    --text: #1F2A33;
+    --mesh-accent: #2FB8B2;
+    --ui-border: #C8D1DA;
+    --ui-fill-active: #E2E8EE;
+    --ui-icon: #3A4A57;
+    --ui-icon-active: #1F2A33;
+    --vignette-opacity: 0.3;
+    --glow-opacity: 0.3;
+}
+
+body.theme-dark {
+    --bg: #0B0D10;
+    --text: #E6E8EA;
+    --mesh-accent: #38D6D0;
+    --ui-border: #2A2F34;
+    --ui-fill-active: #1C2126;
+    --ui-icon: #C9CED3;
+    --ui-icon-active: #E6E8EA;
+    --vignette-opacity: 0.7;
+    --glow-opacity: 0.5;
+}
+
+/* Global Reset & Layout */
+* {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%; /* Fallback */
+    height: 100dvh;
+    overflow: hidden;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-primary);
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Backgrounds */
+#webgl-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    display: block;
+}
+
+#fallback-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: radial-gradient(circle at center, transparent 0%, var(--bg) 100%);
+}
+
+/* Overlays */
+.overlay-grain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.overlay-vignette {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0, var(--vignette-opacity)) 120%);
+    mix-blend-mode: multiply; /* Helps blend nicely with both light/dark */
+}
+
+/* Center Glow (Simulated) */
+/* Can be part of the vignette or separate. Spec says "Neutral center glow". */
+.overlay-vignette::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle, rgba(255,255,255, var(--glow-opacity)) 0%, transparent 70%);
+    filter: blur(80px);
+    opacity: 0.1; /* Very subtle */
+    pointer-events: none;
+    mix-blend-mode: overlay;
+}
+
+
+/* Content Layout */
+.content-wrapper {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    /* Vertical offset: 5-8% upward */
+    transform: translateY(-6vh); 
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Typography */
+.domain-text {
+    margin: 0;
+    font-weight: 400;
+    text-transform: lowercase;
+    letter-spacing: normal;
+    /* Clamp: 32px min, 72px max, scaling with vw */
+    font-size: clamp(32px, 6vw, 72px);
+    line-height: 1.1;
+    color: var(--text);
+    /* Micro fade-in: 0 -> 1 over 200ms */
+    opacity: 0;
+    animation: fadeIn 0.8s ease-out 0.2s forwards; /* Slower fade for elegance */
+    user-select: text;
+}
+
+.email-text {
+    font-weight: 300; /* Fallback to 400 if 300 not avail */
+    /* Size: ~25% of domain size implies visual hierarchy. 
+       Spec: clamp(16px, 3vw, 36px) is roughly half. 
+       Let's stick to spec recommended clamp. */
+    font-size: clamp(14px, 2.5vw, 24px); 
+    letter-spacing: 0.06em;
+    color: var(--text);
+    
+    /* Spacing: clamp(40px, 6vh, 64px) */
+    margin-top: clamp(40px, 6vh, 64px);
+    
+    /* Fade-in staggered +100ms */
+    opacity: 0;
+    animation: fadeIn 0.8s ease-out 0.4s forwards;
+    user-select: text;
+    cursor: default; /* No pointer */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Theme Control */
+.theme-control {
+    position: absolute;
+    top: max(32px, env(safe-area-inset-top));
+    right: max(32px, env(safe-area-inset-right));
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: 1px solid var(--ui-border);
+    border-radius: 12px;
+    padding: 2px;
+    transition: border-color 0.3s ease;
+}
+
+@media (max-width: 600px) {
+    .theme-control {
+        top: max(16px, env(safe-area-inset-top));
+        right: max(16px, env(safe-area-inset-right));
+        border-radius: 10px;
+    }
+}
+
+.theme-btn {
+    background: transparent;
+    border: none;
+    padding: 6px 10px;
+    margin: 0;
+    cursor: pointer;
+    color: var(--ui-icon);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.theme-btn:focus-visible {
+    outline: 2px solid var(--mesh-accent);
+    outline-offset: 2px;
+}
+
+.theme-btn.active {
+    background-color: var(--ui-fill-active);
+    color: var(--ui-icon-active);
+}
+
+.divider {
+    width: 1px;
+    height: 16px;
+    background-color: var(--ui-border);
+    margin: 0 2px;
+    opacity: 0.5;
+}
